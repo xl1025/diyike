@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>八仙过海·数护同行（沉浸互动全量版）— 中职护理数学</title>
+    <!-- 引入 MathJax 渲染 LaTeX 数学公式 -->
+    <script>
+        window.MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+    <style>
+        :root {
+            --ink: #2b2118; --ink-soft: #4a3b2c; --paper: #f7f1e1; --paper-2: #efe6cf;
+            --seal: #9e2b25; --seal-light: #c0392b; --gold: #b8860b; --gold-light: #d4af37;
+            --jade: #2e7d6b; --primary: #1a237e; --primary-light: #283593;
+            --teal: #2e8b8b; --red: #c62828; --shadow: rgba(0,0,0,0.35);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%;
+            font-family: "STKaiti","KaiTi","楷体","Microsoft YaHei",serif;
+            background: #0d1b2a; overflow: hidden; color: var(--ink);
+        }
+        #app { width: 100%; height: 100%; position: relative; }
+        .slide {
+            position: absolute; inset: 0; width: 100%; height: 100%;
+            display: none; flex-direction: column; justify-content: center; align-items: center;
+            padding: 2vh 2vw; background-size: cover; background-position: center;
+            transition: opacity .45s ease; opacity: 0; z-index: 0;
+            --base-font: max(24pt, 1.8vw); font-size: var(--base-font);
+        }
+        .slide.active { display: flex; opacity: 1; z-index: 1; }
+        .slide::before { content: ""; position: absolute; inset: 0; background: rgba(13,27,42,0.55); z-index: 0; }
+        .slide.no-mask::before { display: none; }
+        
+        .slide-content {
+            position: relative; z-index: 2; width: 96vw; max-width: 1700px; height: 94%;
+            background: rgba(247,241,225,0.97); border-radius: 12px; box-shadow: 0 20px 60px var(--shadow);
+            padding: 3vh 3.5vw; overflow-y: auto; display: flex; flex-direction: column; border: 2px solid var(--gold);
+        }
+        .slide-content::-webkit-scrollbar { width: 10px; }
+        .slide-content::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 5px; }
+        
+        /* 标题横幅 */
+        .ppt-header { display: flex; align-items: center; gap: 16px; margin-bottom: 1.6vh; padding-bottom: 1.2vh; border-bottom: 2px solid var(--gold); flex-shrink: 0; }
+        .seal { flex-shrink: 0; width: 64px; height: 64px; background: var(--seal); color: #fff; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: 800; line-height: 1.1; box-shadow: 0 4px 10px rgba(0,0,0,.25); border: 2px solid #f3e6c0; }
+        .seal .num { font-size: 1.3rem !important; white-space: nowrap; letter-spacing: 1px;} .seal .txt { display: none; }
+        .ppt-title { font-weight: 800; color: var(--ink); letter-spacing: 2px; font-size: max(32pt, 2.5vw); }
+        .ppt-sub { color: var(--jade); margin-top: .3vh; font-weight: 600; font-size: max(22pt, 1.5vw); }
+
+        /* 古风文本框与排版 */
+        .ppt-body { flex: 1; display: flex; flex-direction: column; gap: 2vh; line-height: 1.75; justify-content: center; }
+        .ink-box { background: rgba(253, 249, 238, 0.9); border: 2px solid #d4c4a8; border-radius: 10px; padding: 2.5vh 2vw; box-shadow: 0 6px 16px rgba(0,0,0,.08); position: relative; }
+        .ink-box::before { content: ""; position: absolute; top: -12px; left: 16px; background: var(--seal); color: #fff; padding: 4px 14px; border-radius: 6px; font-weight: 700; letter-spacing: 1px; font-size: 1.2rem !important; box-shadow: 0 2px 8px rgba(0,0,0,0.3); }
+        .ink-box.l1::before { content: "卷壹"; } .ink-box.l2::before { content: "卷贰"; } .ink-box.note::before { content: "注"; background: var(--jade); }
+        .ink-box h4 { color: var(--seal); margin: .2vh 0 1vh; font-size: max(28pt, 2.1vw) !important; border-bottom: 1px dashed #d4c4a8; padding-bottom: 5px; }
+        .ink-box p, .ink-box li { font-size: var(--base-font); }
+
+        /* 背景暗纹 */
+        .bg-han { background-image: linear-gradient(rgba(253,249,238,0.85), rgba(247,241,225,0.95)), url('韩湘子.jpg') !important; background-size: cover !important; background-position: center !important; }
+        .bg-cao { background-image: linear-gradient(rgba(253,249,238,0.85), rgba(247,241,225,0.95)), url('曹国舅.jpg') !important; background-size: cover !important; background-position: center !important; }
+        .bg-lan { background-image: linear-gradient(rgba(253,249,238,0.85), rgba(247,241,225,0.95)), url('蓝采荷.jpg') !important; background-size: cover !important; background-position: center !important; }
+        .bg-zhang { background-image: linear-gradient(rgba(253,249,238,0.85), rgba(247,241,225,0.95)), url('张果老.jpg') !important; background-size: cover !important; background-position: center !important; }
+        .bg-zhong { background-image: linear-gradient(rgba(253,249,238,0.85), rgba(247,241,225,0.95)), url('钟离权.jpg') !important; background-size: cover !important; background-position: center !important; }
+        .bg-he { background-image: linear-gradient(rgba(253,249,238,0.85), rgba(247,241,225,0.95)), url('何仙姑.jpg') !important; background-size: cover !important; background-position: center !important; }
+        .bg-lv { background-image: linear-gradient(rgba(253,249,238,0.85), rgba(247,241,225,0.95)), url('吕洞宾.jpg') !important; background-size: cover !important; background-position: center !important; }
+        .bg-tie { background-image: linear-gradient(rgba(253,249,238,0.85), rgba(247,241,225,0.95)), url('铁拐李.jpg') !important; background-size: cover !important; background-position: center !important; }
+        
+        .grid-1x3 { display: grid; grid-template-columns: repeat(3, 1fr); align-items: stretch; gap: 2vw; height: 100%; }
+        .grid-1x4 { display: grid; grid-template-columns: repeat(4, 1fr); align-items: stretch; gap: 1.5vw; height: 100%; }
+        .grid-3x1 { display: grid; grid-template-rows: repeat(3, 1fr); align-items: stretch; gap: 2vh; height: 100%; }
+        .grid-2col { display: grid; grid-template-columns: 1fr 1fr; align-items: stretch; gap: 2.5vw; height: 100%; }
+        
+        /* 步进显示动效 */
+        .step-item { opacity: 0; transform: translateY(30px); transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1); visibility: hidden; }
+        .step-item.revealed { opacity: 1; transform: translateY(0); visibility: visible; }
+        .step-item.inline-step { transform: translateX(-20px); }
+        .step-item.inline-step.revealed { transform: translateX(0); }
+
+        /* 视频片头与课件大门 */
+        .video-full { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+        #introPopup { position: absolute; z-index: 10; background: rgba(10,20,40,0.85); border: 2px solid var(--gold); border-radius: 16px; padding: 6vh 6vw; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.8); display: none; flex-direction: column; align-items: center; opacity: 0; transition: opacity 1s ease; }
+        #entry-gate { position: fixed; inset: 0; z-index: 999999; background: #0d1b2a; display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 0.8s ease; }
+
+        /* 探索人物热点 */
+        .hotspot { position: absolute; width: 8vw; height: 40vh; cursor: pointer; border-radius: 50%; background: transparent; z-index: 5; transition: 0.3s; display: flex; align-items: flex-end; justify-content: center; }
+        .hotspot:hover { background: rgba(212,175,55,0.15); box-shadow: 0 0 20px rgba(212,175,55,0.4); }
+        .hotspot-pulse { width: 15px; height: 15px; background: var(--gold-light); border-radius: 50%; box-shadow: 0 0 15px var(--gold); animation: pulseAnim 1.5s infinite; margin-bottom: 20px; }
+        @keyframes pulseAnim { 0% { transform: scale(1); opacity: 1; } 100% { transform: scale(2.5); opacity: 0; } }
+
+        /* 人物详情弹窗 */
+        #charModal { position: fixed; inset: 0; background: rgba(0,0,0,0.85); z-index: 99999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.4s; }
+        .modal-content { width: 75vw; max-width: 1100px; background: rgba(247,241,225,0.98); border: 4px solid var(--gold); border-radius: 16px; padding: 4vh 3vw; display: flex; gap: 3vw; position: relative; box-shadow: 0 10px 50px rgba(0,0,0,0.8); align-items: center; }
+        .modal-close { position: absolute; top: 15px; right: 20px; font-size: 2.5rem; background: none; border: none; color: var(--seal); cursor: pointer; transition: 0.3s; z-index: 10; }
+        .modal-close:hover { transform: scale(1.2); color: var(--red); }
+        .modal-img-wrap { width: 40%; height: 55vh; background: transparent; border-radius: 12px; border: none; overflow: hidden; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .modal-img-wrap img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 15px rgba(0,0,0,0.4)); }
+
+        /* 师者引路布局 */
+        .spider-wrap { position: relative; width: 100%; height: 65vh; max-width: 1400px; margin: 2vh auto 0; }
+        .spider-center { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 16vw; max-width: 200px; height: 16vw; max-height: 200px; background: radial-gradient(circle, var(--seal-light), var(--seal)); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 6px solid var(--gold-light); z-index: 10; box-shadow: 0 0 30px rgba(184,134,11,0.6); font-size: max(28pt, 2.2vw) !important; letter-spacing: 2px; }
+        .spider-node { position: absolute; transform: translate(-50%, -50%); width: max-content; padding: 2vh 3vw; background: var(--paper); border: 3px solid; border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.2); text-align: center; z-index: 5; display: flex; flex-direction: column; justify-content: center; }
+        .spider-node h4 { margin-bottom: 1vh; font-size: max(24pt, 1.8vw) !important; }
+
+        /* 综合控制台面板 */
+        .sim-dashboard { display: grid; grid-template-columns: 4.5fr 5.5fr; gap: 2vw; height: 100%; min-height: 55vh; }
+        .sim-scenario { border: 2px solid var(--gold); border-radius: 12px; padding: 3vh 2.5vw; box-shadow: inset 0 0 40px rgba(184, 134, 11, 0.1); display: flex; flex-direction: column; justify-content: center; }
+        .sim-console { background: rgba(10, 20, 40, 0.95); border: 2px solid var(--teal); border-radius: 12px; padding: 3vh 2.5vw; color: #cfefff; box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 1.5vh; justify-content: center; position: relative;}
+        .sim-console ul { list-style: none; padding-left: 0; }
+        .sim-console ul li { background: rgba(255, 255, 255, 0.08); border-left: 5px solid var(--teal); padding: 1.5vh 1.5vw; margin-bottom: 1.5vh; border-radius: 0 8px 8px 0; font-family: "Courier New", Courier, monospace; }
+        
+        /* ================= 高性能跑马灯点名系统 ================= */
+        .gacha-console { align-items: center; justify-content: center; overflow: hidden; display: flex; flex-direction: column; }
+        
+        .roulette-container {
+            width: 100%; height: 35vh; min-height: 220px; position: relative; overflow: hidden;
+            border: 3px solid var(--gold); border-radius: 12px; background: #080e1a;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.9); margin-bottom: 2vh; flex-shrink: 0;
+        }
+        .roulette-track {
+            display: flex; height: 100%; position: absolute; left: 0; top: 0;
+            align-items: center; justify-content: flex-start; width: max-content;
+            will-change: transform; 
+        }
+        .roulette-track img {
+            height: 90%; width: auto; min-width: 100px; object-fit: cover; 
+            margin: 0 8px; border-radius: 6px; backface-visibility: hidden; transform: translateZ(0);
+        }
+        .roulette-selector {
+            position: absolute; left: 50%; top: 2%; bottom: 2%; width: 130px; transform: translateX(-50%);
+            border: 4px solid var(--red); border-radius: 12px; box-shadow: 0 0 25px var(--red), inset 0 0 15px var(--red);
+            z-index: 10; pointer-events: none;
+        }
+
+        .roulette-result {
+            position: absolute; inset: 0; background: rgba(0,0,0,0.85); 
+            display: none; align-items: center; justify-content: center; z-index: 20;
+        }
+        .roulette-result img {
+            height: 95%; width: auto; object-fit: contain;
+            animation: finalPop 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+        @keyframes finalPop {
+            0% { transform: scale(0.5); opacity: 0; filter: drop-shadow(0 0 0 transparent); }
+            60% { transform: scale(1.1); opacity: 1; filter: drop-shadow(0 0 20px var(--gold)); }
+            100% { transform: scale(1); opacity: 1; filter: drop-shadow(0 0 10px var(--gold)); }
+        }
+
+        .gufeng-btn { background: linear-gradient(135deg, var(--seal), var(--seal-light)); color: #fff; border: 2px solid var(--gold); border-radius: 8px; padding: 1.5vh 2vw; font-weight: 800; cursor: pointer; box-shadow: 0 6px 15px rgba(198, 40, 40, 0.4); transition: all 0.3s; font-size: max(24pt, 1.5vw) !important; font-family: inherit; letter-spacing: 2px; }
+        .gufeng-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(198, 40, 40, 0.6), 0 0 15px var(--gold-light); }
+        .upload-btn { background: linear-gradient(135deg, var(--teal), var(--jade)); }
+
+        /* 左侧：LaTeX 真题面板 */
+        .quiz-card { border-radius: 12px; padding: 4vh 3vw; display: flex; flex-direction: column; justify-content: center; height: 100%; text-align: left; }
+        .quiz-title { font-weight: 800; color: var(--gold-light); margin-bottom: 3vh; font-size: max(26pt, 1.8vw) !important; text-shadow: 0 1px 2px rgba(255,255,255,0.8); line-height: 1.8; }
+        .quiz-options { display: grid; grid-template-columns: 1fr 1fr; gap: 2vw; }
+        .quiz-opt-btn { background: rgba(255,255,255,0.95); border: 2px solid var(--ink-soft); border-radius: 8px; padding: 2vh 1.5vw; text-align: left; cursor: pointer; font-size: max(22pt, 1.5vw); transition: .2s; font-family: inherit; color: var(--ink); font-weight: bold;}
+        .quiz-opt-btn:hover { background: #e8dbb9; }
+        .quiz-opt-btn.correct { background: #d4edda; border-color: #28a745; color: #155724; }
+        .quiz-opt-btn.wrong { background: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .quiz-exp { margin-top: 3vh; padding: 2vh; background: rgba(0,0,0,0.7); border-left: 5px solid var(--jade); border-radius: 6px; font-size: max(22pt, 1.5vw) !important; color: #fff; line-height: 1.8;}
+
+        /* UI杂项 */
+        .progress-bar { position: fixed; bottom: 0; left: 0; right: 0; height: 6px; background: rgba(255,255,255,0.15); z-index: 100; pointer-events: none; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--gold), var(--gold-light)); width: 0%; transition: width .4s ease; }
+        
+        #menu-icon { position: fixed; top: 2vh; right: 1.5vw; z-index: 9999; font-size: 2rem; cursor: pointer; background: rgba(13,27,42,0.4); color: rgba(212,175,55,0.7); border: 2px solid rgba(212,175,55,0.4); border-radius: 50%; width: 50px; height: 50px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(0,0,0,0.3); transition: all 0.3s ease; }
+        #menu-icon:hover { background: rgba(13,27,42,0.9); color: var(--gold-light); border-color: var(--gold); transform: rotate(90deg) scale(1.1); box-shadow: 0 4px 15px rgba(0,0,0,0.6); }
+
+        #nav-panel { position: fixed; inset: 0; background: rgba(8,16,30,.92); z-index: 10000; display: none; flex-direction: column; align-items: center; padding: 6vh 4vw; }
+        #nav-panel.open { display: flex; }
+        .np-head { width: min(1000px, 94vw); display: flex; align-items: center; justify-content: space-between; color: #fff; margin-bottom: 2.5vh; gap: 16px; }
+        .np-head h2 { color: var(--gold-light); margin: 0; font-size: 24pt !important; }
+        .np-close { background: transparent; border: 2px solid var(--gold); color: var(--gold-light); border-radius: 24px; padding: 8px 20px; cursor: pointer; font-family: inherit; font-size: 18pt !important; }
+        .np-close:hover { background: var(--gold); color: #2b2118; }
+        #np-list { width: min(1000px, 94vw); max-height: 70vh; overflow: auto; padding-right: 10px; }
+        .np-item { display: flex; align-items: center; gap: 16px; background: rgba(247,241,225,.96); border: 2px solid var(--gold); border-radius: 12px; padding: 12px 20px; margin: 10px 0; font-size: 20pt !important; cursor: pointer; transition: 0.2s; }
+        .np-item:hover { transform: translateX(10px); background: #fff; border-color: var(--seal); }
+        .np-no { font-weight: 800; color: var(--seal); min-width: 40px; text-align: center; }
+        .np-title { flex: 1; color: var(--ink); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 20pt !important; font-weight: bold; }
+
+        .slide p, .slide li, .slide div:not(.cover-title):not(.ppt-title):not(.ppt-sub):not(.spider-center) { font-size: var(--base-font); }
+        .center-text { text-align: center; }
+        .map-return-btn { position: absolute; bottom: 20px; right: 30px; z-index: 99; background: var(--seal); color: #fff; border: 2px solid var(--gold); border-radius: 24px; padding: 8px 20px; font-size: max(16pt, 1vw); font-weight: bold; cursor: pointer; box-shadow: 0 4px 12px rgba(0,0,0,0.4); transition: 0.3s; }
+        .map-return-btn:hover { background: var(--seal-light); transform: scale(1.05); }
+    </style>
+</head>
+<body>
+    
+    <!-- ================= 音频引擎预载池 ================= -->
+    <audio id="introAudio" src="第一页.m4a" preload="auto"></audio>
+    <div id="audio-pool" style="display:none;">
+        <audio id="audio_钟离权" src="钟离权.m4a" preload="auto"></audio>
+        <audio id="audio_张果老" src="张果老.m4a" preload="auto"></audio>
+        <audio id="audio_铁拐李" src="铁拐李.m4a" preload="auto"></audio>
+        <audio id="audio_何仙姑" src="何仙姑.m4a" preload="auto"></audio>
+        <audio id="audio_蓝采和" src="蓝采荷.m4a" preload="auto"></audio>
+        <audio id="audio_曹国舅" src="曹国舅.m4a" preload="auto"></audio>
+        <audio id="audio_韩湘子" src="韩湘子.m4a" preload="auto"></audio>
+        <audio id="audio_吕洞宾" src="吕洞宾.m4a" preload="auto"></audio>
+    </div>
+
+    <!-- ================= 课件大门 ================= -->
+    <div id="entry-gate">
+        <h1 style="color: var(--gold-light); font-size: 3rem; margin-bottom: 30px; letter-spacing: 5px;">八仙过海 · 数护同行</h1>
+        <button class="gufeng-btn" style="font-size: 1.5rem !important; padding: 15px 40px;" onclick="window.unlockAndStart()">点击进入课堂</button>
+    </div>
+
+    <div id="app">
+        <div id="menu-icon" onclick="window.toggleNav(true); event.stopPropagation();" title="打开目录">☰</div>
+        <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+        <!-- 0. 视频片头弹窗页 -->
+        <section class="slide active no-mask" data-id="p0">
+            <video id="introVideo" class="video-full" src="第一页.mp4" muted playsinline preload="auto"></video>
+            <div id="introPopup">
+                <h1 style="color:var(--gold-light); font-size:max(50pt, 4vw); letter-spacing:4px; margin-bottom:2vh; text-shadow:0 4px 15px rgba(0,0,0,0.8);">八仙过海 · 数护同行</h1>
+                <h2 style="color:#fff; font-size:max(30pt, 2.2vw); margin-bottom:4vh;">中职护理专业数学 开学第一课</h2>
+                <div style="background: rgba(255,255,255,0.1); padding: 2vh 4vw; border-radius: 12px; border: 1px solid rgba(212,175,55,0.3);">
+                    <p style="color:var(--gold); font-size:max(26pt, 1.8vw); margin-bottom:1vh; font-weight: bold;">汇报人：许鸽</p>
+                    <p style="color:#cfefff; font-size:max(22pt, 1.5vw);">时间：2026年</p>
+                </div>
+                <button class="gufeng-btn" style="margin-top:4vh;" onclick="window.advanceStepOrSlide(); event.stopPropagation();">开启仙途</button>
+            </div>
+        </section>
+
+        <!-- 1. 话题切入 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p1">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">导入</div></div><div><div class="ppt-title">话题切入：暑期热IP拉近距离</div></div></div>
+                <div class="ppt-body" style="align-items: center; justify-content: center;">
+                    <div class="ink-box l1 step-item bg-han" style="width: 80%; text-align: center; padding: 4vh 2vw;">
+                        <p style="font-size: max(32pt, 2vw); font-weight: 800; color: var(--seal);">
+                            "暑假刷屏的《八仙》动漫，大家刷到过吗？<br><br>你印象里的八仙是什么样的？"
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 全景探索：人物面板页 -->
+        <section class="slide no-mask" style="background-image:url('第一页.jpg')" data-id="p1_interact">
+            <div class="hotspot" style="left: 10%; top: 45%;" onclick="window.openCharModal('钟离权'); event.stopPropagation();"><div class="hotspot-pulse"></div></div>
+            <div class="hotspot" style="left: 20%; top: 40%;" onclick="window.openCharModal('张果老'); event.stopPropagation();"><div class="hotspot-pulse"></div></div>
+            <div class="hotspot" style="left: 32%; top: 45%;" onclick="window.openCharModal('铁拐李'); event.stopPropagation();"><div class="hotspot-pulse"></div></div>
+            <div class="hotspot" style="left: 45%; top: 40%;" onclick="window.openCharModal('何仙姑'); event.stopPropagation();"><div class="hotspot-pulse"></div></div>
+            <div class="hotspot" style="left: 55%; top: 45%;" onclick="window.openCharModal('蓝采和'); event.stopPropagation();"><div class="hotspot-pulse"></div></div>
+            <div class="hotspot" style="left: 65%; top: 40%;" onclick="window.openCharModal('曹国舅'); event.stopPropagation();"><div class="hotspot-pulse"></div></div>
+            <div class="hotspot" style="left: 78%; top: 45%;" onclick="window.openCharModal('韩湘子'); event.stopPropagation();"><div class="hotspot-pulse"></div></div>
+            <div class="hotspot" style="left: 88%; top: 40%;" onclick="window.openCharModal('吕洞宾'); event.stopPropagation();"><div class="hotspot-pulse"></div></div>
+            
+            <div style="position: absolute; top: 5vh; width: 100%; text-align: center; pointer-events: none;">
+                <h2 style="color: var(--gold-light); font-size: max(40pt, 3vw); text-shadow: 0 4px 10px rgba(0,0,0,0.8); letter-spacing: 4px;">点击仙尊 · 查阅卷宗</h2>
+            </div>
+        </section>
+
+        <!-- 3. 本课地图 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p2">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">地图</div></div><div><div class="ppt-title">本课地图：四大篇章路线图</div></div></div>
+                <div class="ppt-body" style="align-items: center;">
+                    <div class="ink-box note step-item center-text bg-cao" style="width: 50%;">
+                        <p style="font-weight:700; color:var(--ink);">从“看懂动漫”到“读懂专业”</p>
+                    </div>
+                    
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2.5vh 2.5vw; width: 100%; margin-top: 3vh;">
+                        <div class="ink-box step-item bg-lan" style="border-left: 10px solid var(--primary); cursor: pointer;" onclick="window.gotoId('p3'); event.stopPropagation();">
+                            <h3 style="color: var(--primary); margin-bottom: 0.5vh;">【第一篇】动漫破冰 ➔</h3>
+                            <p style="margin:0;">剧情脉络与核心命题剖析</p>
+                        </div>
+                        <div class="ink-box step-item bg-zhang" style="border-left: 10px solid var(--jade); cursor: pointer;" onclick="window.gotoId('p4'); event.stopPropagation();">
+                            <h3 style="color: var(--jade); margin-bottom: 0.5vh;">【第二篇】群像内核 ➔</h3>
+                            <p style="margin:0;">核心双雄与岗位标杆精神映射</p>
+                        </div>
+                        <div class="ink-box step-item bg-zhong" style="border-left: 10px solid var(--seal); cursor: pointer;" onclick="window.gotoId('p7'); event.stopPropagation();">
+                            <h3 style="color: var(--seal); margin-bottom: 0.5vh;">【第三篇】医数同源 ➔</h3>
+                            <p style="margin:0;">精准、逻辑与临床模拟控制台</p>
+                        </div>
+                        <div class="ink-box step-item bg-he" style="border-left: 10px solid var(--gold); cursor: pointer;" onclick="window.gotoId('p11'); event.stopPropagation();">
+                            <h3 style="color: var(--gold); margin-bottom: 0.5vh;">【第四篇】互动实战 ➔</h3>
+                            <p style="margin:0;">师者引路、规约与盲盒真题试炼</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. 剧情脉络 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p3">
+            <div class="slide-content" style="position: relative;">
+                <div class="ppt-header"><div class="seal"><div class="num">脉络</div></div><div><div class="ppt-title">第一篇：剧情脉络与破冰</div></div></div>
+                <div class="ppt-body">
+                    <div class="grid-1x3">
+                        <div class="ink-box step-item bg-han"><h4>① 起因</h4><p>仙界至宝失窃，看灯仙官<strong>吕洞宾</strong>被贬下凡，结识市井神偷<strong>钟离权</strong>，达成交易。</p></div>
+                        <div class="ink-box step-item bg-cao"><h4>② 发展</h4><p>假扮神仙骗香火，却假戏真做，真帮百姓治病救灾，被唤作“活神仙”。</p></div>
+                        <div class="ink-box step-item bg-lan"><h4>③ 结局</h4><p>识破天庭阴谋。八凡人挺身对抗权威，救苍生、成真仙。</p></div>
+                    </div>
+                    <div class="ink-box red step-item center-text bg-lv" style="margin-top: 2vh;">
+                        <p style="font-weight:800; font-size: max(28pt, 2vw);">核心命题：草台班子也能办大事 · 凡人也能成“仙”</p>
+                    </div>
+                </div>
+                <button class="map-return-btn" onclick="window.gotoId('p2'); event.stopPropagation();">🧭 返回地图</button>
+            </div>
+        </section>
+
+        <!-- 5. 核心双雄与岗位标杆 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p4">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">群像</div></div><div><div class="ppt-title">第二篇：人物群像核心与标杆</div></div></div>
+                <div class="ppt-body">
+                    <div class="grid-1x4">
+                        <div class="ink-box step-item center-text">
+                            <img src="吕洞宾.png" style="width:100%; height:200px; object-fit:contain; border-radius:8px; margin-bottom:1vh; background: #000;">
+                            <h4>吕洞宾 <span style="background:var(--jade); color:#fff; padding:2px 8px; border-radius:12px; font-size:0.7em;">核心</span></h4>
+                            <p>从利己回天庭，到守护苍生。</p>
+                        </div>
+                        <div class="ink-box step-item center-text">
+                            <img src="钟离权.png" style="width:100%; height:200px; object-fit:contain; border-radius:8px; margin-bottom:1vh; background: #000;">
+                            <h4>钟离权 <span style="background:var(--jade); color:#fff; padding:2px 8px; border-radius:12px; font-size:0.7em;">救赎</span></h4>
+                            <p>市井神偷，骨子里藏侠气。</p>
+                        </div>
+                        <div class="ink-box step-item center-text">
+                            <img src="铁拐李.png" style="width:100%; height:200px; object-fit:contain; border-radius:8px; margin-bottom:1vh; background: #000;">
+                            <h4>铁拐李 <span style="background:var(--primary); color:#fff; padding:2px 8px; border-radius:12px; font-size:0.7em;">技术</span></h4>
+                            <p>手艺极精，凭真本事立足。</p>
+                        </div>
+                        <div class="ink-box step-item center-text">
+                            <img src="何仙姑.png" style="width:100%; height:200px; object-fit:contain; border-radius:8px; margin-bottom:1vh; background: #000;">
+                            <h4>何仙姑 <span style="background:var(--primary); color:#fff; padding:2px 8px; border-radius:12px; font-size:0.7em;">定心</span></h4>
+                            <p>清醒有主见，稳住全局。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. 精神内核：草台班子 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p5">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">内核</div></div><div><div class="ppt-title">精神内核：“草台班子”也能办大事</div></div></div>
+                <div class="ppt-body">
+                    <div class="ink-box l1 step-item bg-zhang">
+                        <ul>
+                            <li class="step-item inline-step" style="margin-bottom: 2vh;">八仙最开始没人看好，有人拖后腿、有人闹矛盾，但最后拯救天下的就是这个不完美团队。</li>
+                            <li class="step-item inline-step"><strong>真实案例（抢救配合）：</strong>一次心肺复苏，医生按压、护士给药、技师连监护——任何一人掉链子，命就悬了。</li>
+                        </ul>
+                    </div>
+                    <div class="ink-box blue step-item center-text bg-zhong" style="margin-top: 3vh;">
+                        <p style="font-weight:800; color:var(--primary); font-size: max(32pt, 2vw);">团队协作 = 医护工作的生命线</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 7. 精神内核：从为自己到为别人 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p6">
+            <div class="slide-content" style="position: relative;">
+                <div class="ppt-header"><div class="seal"><div class="num">内核</div></div><div><div class="ppt-title">第二篇：从“为自己”到“为别人”</div></div></div>
+                <div class="ppt-body grid-2col">
+                    <div class="ink-box step-item bg-han">
+                        <h4>利己的凡人</h4>
+                        <p style="margin-top: 2vh;">八个人最初聚在一起，全是为了自己：赚钱、赎罪、躲债、混饭吃。</p>
+                        <p style="margin-top: 2vh; color:#888;">（最初的动机往往都很平凡）</p>
+                    </div>
+                    <div class="ink-box red step-item bg-cao">
+                        <h4>利他的真仙</h4>
+                        <p style="margin-top: 2vh;">走着走着，他们看见别人的苦难，扛起不属于自己的责任——这份转变，就是真正的成长。</p>
+                        <p style="margin-top: 2vh; font-weight:800; color:var(--seal);">护理职业的底色：利他 · 担当 · 守护</p>
+                    </div>
+                </div>
+                <button class="map-return-btn" onclick="window.gotoId('p2'); event.stopPropagation();">🧭 返回地图</button>
+            </div>
+        </section>
+
+        <!-- 8. 医数同源① -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p7">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">医数</div></div><div><div class="ppt-title">医数同源①：精准——炼药如配药，数学是底线</div></div></div>
+                <div class="ppt-body grid-3x1">
+                    <div class="ink-box step-item bg-lan">
+                        <p>八仙炼制丹药，<strong>药量差一丝就前功尽弃</strong>；临床配药、算输液速度，差一毫升都关乎患者安全。</p>
+                    </div>
+                    <div class="ink-box red step-item bg-zhang">
+                        <p><strong>真实警示案例：</strong>某院曾因护士把“地高辛 0.25 mg”误看作“0.5 mg”，致患者洋地黄中毒。根源是剂量换算意识缺失。</p>
+                    </div>
+                    <div class="ink-box teal step-item bg-zhong">
+                        <p><strong>数学应用示例：</strong>医嘱“青霉素 80 万 U 溶于 4 mL”，抽 40 万 U 则应抽 <b>2 mL</b>——比例计算，每天都在病房发生。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 9. 医数同源② -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p8">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">医数</div></div><div><div class="ppt-title">医数同源②：逻辑与成长</div></div></div>
+                <div class="ppt-body grid-2col">
+                    <div class="ink-box step-item bg-han">
+                        <h4>逻辑——组队如协作</h4>
+                        <p style="margin-top: 2vh;">医护工作要分级护理、排序优先级。按病情轻重归入特级/一级护理集合，靠的就是<strong>分类与排序</strong>。</p>
+                        <p style="margin-top: 2vh; color: var(--teal); font-weight:bold;">对应数学：集合与逻辑用语</p>
+                    </div>
+                    <div class="ink-box step-item bg-cao">
+                        <h4>成长——修仙如求学</h4>
+                        <p style="margin-top: 2vh;">中职护理 → 对口升学(数学必考) → 专升本 → 护师。每一级都需要数学底子：读图表、算半衰期。</p>
+                        <p style="margin-top: 2vh; color: var(--gold); font-weight:bold;">对应数学：函数、数列、统计</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. 临床模拟① -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p9">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">临床</div></div><div><div class="ppt-title">临床模拟①：配药计算控制台</div></div></div>
+                <div class="ppt-body">
+                    <div class="sim-dashboard">
+                        <div class="sim-scenario step-item bg-tie">
+                            <h3 style="color: var(--seal); margin-bottom: 1.5vh;">📜 医嘱下达</h3>
+                            <p style="line-height: 1.4;">
+                               <strong>患者信息：</strong> 体重 50 kg<br>
+                               <strong>临床医嘱：</strong> “头孢曲松 1 g 静脉滴注”<br>
+                               <strong>药房给药：</strong> 提供粉针剂，规格为 <b style="color: var(--seal); font-size: 1.3em;">2 g / 支</b><br>
+                               <strong>操作规范：</strong> 需用 0.9% 氯化钠 10 mL 溶解抽取。
+                            </p>
+                        </div>
+                        <div class="sim-console step-item">
+                            <h4>⚙️ 剂量核算中枢</h4>
+                            <ul>
+                                <li class="step-item inline-step">
+                                    <span style="color: #8892b0;">STEP 01: 浓度折算</span><br>
+                                    浓度 = 2000 mg ÷ 10 mL = <strong>200 mg/mL</strong>
+                                </li>
+                                <li class="step-item inline-step">
+                                    <span style="color: #8892b0;">STEP 02: 抽吸量计算</span><br>
+                                    目标量 = 1000 mg ÷ 200 mg/mL = <strong style="color:var(--gold-light);">5 mL</strong>
+                                </li>
+                                <li class="step-item inline-step" style="border-left-color: var(--red);">
+                                    <span style="color: #8892b0;">⚠️ 安全限值核验</span><br>
+                                    上限 20mg/kg。 20 × 50 = 1000mg。 <strong>未超量</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. 临床模拟② -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p10">
+            <div class="slide-content" style="position: relative;">
+                <div class="ppt-header"><div class="seal"><div class="num">临床</div></div><div><div class="ppt-title">临床模拟②：输液滴速控制台</div></div></div>
+                <div class="ppt-body">
+                    <div class="sim-dashboard">
+                        <div class="sim-scenario step-item bg-lv">
+                            <h3 style="color: var(--seal); margin-bottom: 1.5vh;">📜 医嘱下达</h3>
+                            <p style="line-height: 1.4;">
+                               <strong>情境：</strong> 医嘱“5% 葡萄糖 500 mL，8 小时内滴完”。<br>
+                               <strong>输液器标准：</strong> 滴系数为 <b style="color: var(--seal); font-size: 1.3em;">20 滴/mL</b>。
+                            </p>
+                        </div>
+                        <div class="sim-console step-item">
+                            <h4>⚙️ 滴速核算中枢</h4>
+                            <ul>
+                                <li class="step-item inline-step">
+                                    <span style="color: #8892b0;">STEP 01: 时间换算</span><br>
+                                    时间 = 8 × 60 = 480 分钟
+                                </li>
+                                <li class="step-item inline-step">
+                                    <span style="color: #8892b0;">STEP 02: 滴速计算</span><br>
+                                    滴速 = 500 × 20 ÷ 480 ≈ <strong style="color:var(--gold-light);">21 滴/分</strong>
+                                </li>
+                                <li class="step-item inline-step" style="border-left-color: var(--teal);">
+                                    <span style="color: #8892b0;">🤔 进阶思考</span><br>
+                                    改 4 小时滴完，滴速变多少？<br>
+                                    <strong style="color:#cfefff;">[ 反比例函数关系 ]</strong>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <button class="map-return-btn" onclick="window.gotoId('p2'); event.stopPropagation();">🧭 返回地图</button>
+            </div>
+        </section>
+
+        <!-- 12. 师者引路 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p11">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">师者</div></div><div><div class="ppt-title">师者引路：这门课，我们一起解锁什么</div></div></div>
+                <div class="ppt-body">
+                    <div class="spider-wrap step-item">
+                        <div class="spider-center">核心目标</div>
+                        
+                        <div class="step-item" style="position: absolute; inset: 0; pointer-events: none;">
+                            <svg style="position:absolute; inset:0; width:100%; height:100%; z-index:1;"><line x1="50%" y1="50%" x2="50%" y2="15%" stroke="var(--jade)" stroke-width="6" stroke-dasharray="12 8"/></svg>
+                            <div class="spider-node bg-he" style="left: 50%; top: 15%; border-color: var(--jade); pointer-events: auto; width: max-content; padding: 2vh 3vw;">
+                                <h4 style="color: var(--jade);">💡 不是枯燥的刷题课</h4>
+                                <p style="white-space: nowrap;">对接临床岗位的实用能力课</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-item" style="position: absolute; inset: 0; pointer-events: none;">
+                            <svg style="position:absolute; inset:0; width:100%; height:100%; z-index:1;"><line x1="50%" y1="50%" x2="20%" y2="85%" stroke="var(--gold)" stroke-width="6" stroke-dasharray="12 8"/></svg>
+                            <div class="spider-node bg-zhang" style="left: 20%; top: 85%; border-color: var(--gold); pointer-events: auto; width: max-content; padding: 2vh 3vw;">
+                                <h4 style="color: var(--gold);">📈 不是难上天的天书</h4>
+                                <p style="white-space: nowrap;">冲刺对口升学的基础提分课</p>
+                            </div>
+                        </div>
+                        
+                        <div class="step-item" style="position: absolute; inset: 0; pointer-events: none;">
+                            <svg style="position:absolute; inset:0; width:100%; height:100%; z-index:1;"><line x1="50%" y1="50%" x2="80%" y2="85%" stroke="var(--red)" stroke-width="6" stroke-dasharray="12 8"/></svg>
+                            <div class="spider-node bg-lv" style="left: 80%; top: 85%; border-color: var(--red); pointer-events: auto; width: max-content; padding: 2vh 3vw;">
+                                <h4 style="color: var(--red);">🎯 圆升学梦想</h4>
+                                <p style="white-space: nowrap;">练数学思维，做精准护理</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 13. 四条规约 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p12">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">规约</div></div><div><div class="ppt-title">修炼规约：数学课堂·四条修仙规约</div></div></div>
+                <div class="ppt-body">
+                    <div class="grid-1x4">
+                        <div class="ink-box step-item center-text bg-han">
+                            <div style="font-size:3rem; margin-bottom:1vh;">🧘</div>
+                            <h4>1. 凝神聚气</h4>
+                            <p>保持专注，不睡觉、不神游，跟上思路思考。</p>
+                        </div>
+                        <div class="ink-box step-item center-text bg-cao">
+                            <div style="font-size:3rem; margin-bottom:1vh;">📱</div>
+                            <h4>2. 收起法宝</h4>
+                            <p>上课前手机统一交到班级收纳处，下课取回。</p>
+                        </div>
+                        <div class="ink-box step-item center-text bg-lan">
+                            <div style="font-size:3rem; margin-bottom:1vh;">✍️</div>
+                            <h4>3. 按时渡劫</h4>
+                            <p>课后作业按时完成提交，不拖欠、不抄袭。</p>
+                        </div>
+                        <div class="ink-box step-item center-text bg-zhang">
+                            <div style="font-size:3rem; margin-bottom:1vh;">🙋</div>
+                            <h4>4. 提前报备</h4>
+                            <p>有事提前请假，不无故旷课、迟到早退。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= 14. 盲盒点名与真题融合 (左真题 右跑马灯抽卡 高性能优化) ================= -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p13">
+            <div class="slide-content">
+                <div class="ppt-header">
+                    <div class="seal"><div class="num">试炼</div></div>
+                    <div style="flex:1;"><div class="ppt-title">仙术试炼 · 盲盒点名与 2026 真题挑战</div></div>
+                    <input type="file" id="fileUploader" accept=".txt,.csv,.md,.docx,.xlsx" style="display:none;" onchange="window.handleFileUpload(event)">
+                    <button class="gufeng-btn upload-btn" style="padding: 1vh 1.5vw; font-size: max(18pt, 1vw) !important;" onclick="document.getElementById('fileUploader').click(); event.stopPropagation();">📁 导入学生名册</button>
+                </div>
+                
+                <div class="ppt-body step-item">
+                    <!-- 左6右4布局 -->
+                    <div class="sim-dashboard" style="grid-template-columns: 6fr 4fr;">
+                        
+                        <!-- 左侧：动态真题面板 (LaTeX 解析) -->
+                        <div class="sim-scenario bg-zhang" id="quizDisplay" style="position: relative; justify-content: center; align-items: center; text-align: center; overflow-y: auto;">
+                            <h3 style="color: var(--teal); font-size: 2.2rem; letter-spacing: 2px;">等待仙力注入...</h3>
+                            <p style="color: #8892b0; margin-top: 2vh;">请在右侧点击「抽取仙签」获取真题挑战</p>
+                        </div>
+
+                        <!-- 右侧：跑马灯抽卡控制台 -->
+                        <div class="sim-console gacha-console">
+                            <h4 style="text-align: center; font-size: 1.4rem;">🌀 灵匣抽取中心</h4>
+                            
+                            <!-- 高性能跑马灯动画轨 -->
+                            <div class="roulette-container" id="rouletteContainer">
+                                <div class="roulette-track" id="rouletteTrack" style="will-change: transform; transform: translate3d(0,0,0);">
+                                    <!-- JS动态插入图片 -->
+                                </div>
+                                <div class="roulette-selector" id="rouletteSelector"></div>
+                                <!-- 定格放大结果展示区 -->
+                                <div id="rouletteResult" class="roulette-result">
+                                    <img id="rouletteResultImg" src="">
+                                </div>
+                            </div>
+                            
+                            <div style="width:100%; background:rgba(0,0,0,0.4); padding:2vh; border-radius:8px; line-height:1.6; margin-top:1vh; text-align: center; z-index: 10;">
+                                <div>天选学子：<span id="luckyStudent" style="color: var(--gold-light); font-weight:800;">---</span></div>
+                            </div>
+                            <button class="gufeng-btn" style="width: 100%; margin-top: 1.5vh; z-index: 10;" onclick="window.triggerDraw(); event.stopPropagation();">抽取仙签</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 15. 拓展游艺 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p14">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">戏</div></div><div><div class="ppt-title">拓展游艺：在玩中练数学</div></div></div>
+                <div class="ppt-body" style="align-items: center; justify-content: center;">
+                    <div class="ink-box step-item center-text bg-zhong" style="width: 80%; padding: 4vh 2vw;">
+                        <p style="font-size: max(28pt, 2vw); font-weight:700; margin-bottom: 5vh;">轻量互动，培养数学直觉与进制思维</p>
+                        <div style="display: flex; gap: 4vw; justify-content: center;">
+                            <button class="gufeng-btn step-item inline-step" onclick="window.open('game_2048.html', '_blank'); event.stopPropagation();">🎲 2048 · 阵法推演</button>
+                            <button class="gufeng-btn step-item inline-step" onclick="window.open('game_binary_heart.html', '_blank'); event.stopPropagation();">💗 二进制 · 读心仙术</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 16. 进阶成仙 -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p15">
+            <div class="slide-content">
+                <div class="ppt-header"><div class="seal"><div class="num">考</div></div><div><div class="ppt-title">进阶成仙：对口升学数学考情</div></div></div>
+                <div class="ppt-body">
+                    <div class="grid-1x3" style="margin-top: 4vh;">
+                        <div class="ink-box step-item center-text bg-han">
+                            <h4>📌 考试定位</h4>
+                            <p style="margin-top:2vh;">对口升学的必考科目，升入高职护理院校的核心门槛。</p>
+                        </div>
+                        <div class="ink-box step-item center-text bg-cao" style="border-color: var(--gold);">
+                            <h4>📊 试卷结构</h4>
+                            <p style="margin-top:2vh;">选择题 / 填空题 / 解答题<br><br>基础70% · 中档20% · 难题10%</p>
+                        </div>
+                        <div class="ink-box step-item center-text bg-lan" style="border-color: var(--teal);">
+                            <h4>🎯 备考方向</h4>
+                            <p style="margin-top:2vh;">侧重基础应用，贴合职业场景。跟紧课堂稳扎稳打，人人拿基础分。</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 17. 结尾 (增加返回地图按钮) -->
+        <section class="slide" style="background-image:url('第一页.jpg')" data-id="p99">
+            <div class="slide-content" style="background: rgba(10,20,40,0.85); justify-content: center; align-items: center; position: relative;">
+                <h1 style="color: var(--gold-light); font-size: max(56pt, 5vw); margin-bottom: 4vh; text-shadow: 0 4px 10px rgba(0,0,0,0.8);">八仙过海，各显神通</h1>
+                <p style="color: #fff; text-align: center; line-height: 2.2;">
+                    学好数学，就是给咱们的护理专业添一件硬核“法宝”。<br>
+                    接下来的学期，老师和大家一起练本领、打基础，<br>
+                    向升学、护健康！
+                </p>
+                <p style="margin-top: 6vh; color: #cfefff;">谢谢大家！</p>
+                <button class="map-return-btn" onclick="window.gotoId('p2'); event.stopPropagation();">🧭 返回地图</button>
+            </div>
+        </section>
+
+        <!-- 全局弹窗：人物卡片 -->
+        <div id="charModal" onclick="window.closeCharModal()">
+            <div class="modal-content" onclick="event.stopPropagation()">
+                <button class="modal-close" onclick="window.closeCharModal()">×</button>
+                <div class="modal-img-wrap">
+                    <img id="modalImg" src="" alt="仙尊像">
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; justify-content:center;">
+                    <h2 id="modalName" style="color:var(--seal); border-bottom:2px dashed var(--gold); padding-bottom:1.5vh; margin-bottom:2.5vh; font-size:max(32pt, 2.5vw);"></h2>
+                    <p id="modalDesc" style="font-size:max(22pt, 1.5vw); line-height:1.8; color:var(--ink-soft);"></p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 目录抽屉面板 (解决事件冲突并保证自动关闭) -->
+        <div id="nav-panel">
+            <div class="np-head">
+                <div>
+                    <h2>导航卷轴 · 目录</h2>
+                    <div class="np-tip">点击标题跳转；点击右上角关闭。</div>
+                </div>
+                <button class="np-close" onclick="window.toggleNav(false); event.stopPropagation();">✕ 关闭目录</button>
+            </div>
+            <div id="np-list"></div>
+        </div>
+    </div>
+
+    <!-- 逻辑引擎 -->
+    <script>
+    (function () {
+        'use strict';
+        var app = document.getElementById('app');
+        var slides = Array.prototype.slice.call(app.querySelectorAll('.slide'));
+        var currentIndex = -1; 
+        let activeCharAudio = null;
+
+        // ================= 解锁与进入课件 =================
+        window.unlockAndStart = function() {
+            let gate = document.getElementById('entry-gate');
+            gate.style.opacity = '0';
+            setTimeout(() => gate.style.display = 'none', 800);
+            
+            currentIndex = 0; 
+            updateSlide();
+        };
+
+        // ================= 全局音频同步控制 =================
+        function handleGlobalAudio() {
+            let introAudio = document.getElementById('introAudio');
+            if (currentIndex === 0) {
+                if (introAudio && introAudio.paused) {
+                    introAudio.play().catch(e => console.log('Audio autoplay prevented'));
+                }
+            } else {
+                if (introAudio) { 
+                    introAudio.pause(); 
+                    introAudio.currentTime = 0; 
+                }
+            }
+        }
+
+        document.body.addEventListener('click', function() { handleGlobalAudio(); }, { once: false });
+
+        function updateSlide() {
+            slides.forEach((el, idx) => {
+                el.classList.remove('active');
+            });
+            if (currentIndex < 0) return; 
+
+            let currentSlideEl = slides[currentIndex];
+            currentSlideEl.classList.add('active');
+            document.getElementById('progressFill').style.width = ((currentIndex + 1) / slides.length * 100) + '%';
+
+            if(currentIndex === 0) {
+                let video = currentSlideEl.querySelector('video#introVideo');
+                if(video) {
+                    video.currentTime = 0;
+                    video.play();
+                    document.getElementById('introPopup').style.opacity = 0;
+                    document.getElementById('introPopup').style.display = 'none';
+                }
+            }
+            
+            if (window.closeCharModal) window.closeCharModal();
+            handleGlobalAudio();
+        }
+
+        let introVid = document.getElementById('introVideo');
+        if(introVid) {
+            introVid.addEventListener('ended', function() {
+                let popup = document.getElementById('introPopup');
+                popup.style.display = 'flex';
+                setTimeout(() => popup.style.opacity = 1, 100);
+            });
+        }
+
+        // ================= 智能盲操区域点击控制 =================
+        app.addEventListener('click', function(e) {
+            if (currentIndex < 0) return; 
+            if (window.getSelection().toString().length > 0) return;
+
+            if (e.target.closest('button') || e.target.tagName === 'INPUT' || 
+                e.target.closest('#nav-panel') || e.target.closest('#menu-icon') || 
+                e.target.closest('.quiz-card') || e.target.closest('.gacha-console') ||
+                e.target.closest('.hotspot') || e.target.closest('#charModal') ||
+                e.target.closest('.map-return-btn') || e.target.closest('#entry-gate')) {
+                return;
+            }
+
+            let target = e.target.closest('.slide-content');
+            if (target && target.scrollHeight > target.clientHeight) {
+                let rect = target.getBoundingClientRect();
+                if (e.clientX > rect.right - 24) return;
+            }
+
+            if (e.clientX < window.innerWidth / 2) {
+                window.reverseStepOrSlide();
+            } else {
+                window.advanceStepOrSlide();
+            }
+        });
+
+        document.addEventListener('keydown', function (e) {
+            if (currentIndex < 0) return;
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+            if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown' || e.key === 'Enter') { 
+                window.advanceStepOrSlide(); e.preventDefault(); 
+            } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { 
+                window.reverseStepOrSlide(); e.preventDefault(); 
+            }
+        });
+
+        window.advanceStepOrSlide = function() {
+            let currentSlide = slides[currentIndex];
+            let unrevealed = currentSlide.querySelectorAll('.step-item:not(.revealed)');
+            if (unrevealed.length > 0) {
+                unrevealed[0].classList.add('revealed');
+            } else {
+                if (currentIndex < slides.length - 1) { currentIndex++; updateSlide(); }
+            }
+        };
+
+        window.reverseStepOrSlide = function() {
+            let currentSlide = slides[currentIndex];
+            let revealed = currentSlide.querySelectorAll('.step-item.revealed');
+            if (revealed.length > 0) {
+                revealed[revealed.length - 1].classList.remove('revealed');
+            } else {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    slides[currentIndex].querySelectorAll('.step-item').forEach(step => step.classList.add('revealed'));
+                    updateSlide();
+                }
+            }
+        };
+
+        window.gotoId = function(id) {
+            let targetIdx = slides.findIndex(s => s.getAttribute('data-id') === id);
+            if (targetIdx !== -1) {
+                currentIndex = targetIdx;
+                slides[currentIndex].querySelectorAll('.step-item').forEach(step => step.classList.remove('revealed'));
+                updateSlide();
+            }
+        };
+
+        // ================= 极简悬浮目录事件 =================
+        window.toggleNav = function(force) {
+            var panel = document.getElementById('nav-panel');
+            if (!panel) return;
+            
+            var open = (typeof force === 'boolean') ? force : !panel.classList.contains('open');
+            
+            if (open) {
+                panel.classList.add('open');
+                var list = document.getElementById('np-list'); 
+                list.innerHTML = '';
+                slides.forEach(function (el, idx) {
+                    if(idx === 0) return; 
+                    
+                    var titleEl = el.querySelector('.ppt-title') || el.querySelector('h1');
+                    var titleTxt = titleEl ? titleEl.textContent : '第 ' + idx + ' 页';
+                    var item = document.createElement('div'); item.className = 'np-item';
+                    item.innerHTML = `<span class="np-no">${idx}</span><span class="np-title">${titleTxt}</span>`;
+                    
+                    item.onclick = function(evt) {
+                        evt.stopPropagation();
+                        window.gotoId(el.getAttribute('data-id'));
+                        window.toggleNav(false);
+                    };
+                    list.appendChild(item);
+                });
+            } else {
+                panel.classList.remove('open');
+            }
+        };
+
+        // ================= 全景探索人物字典与配音引擎 =================
+        const charData = {
+            "钟离权": { img: "钟离权.png", desc: "【市井神偷 · 侠肝义胆】<br><br>外表玩世不恭的市井混混，曾是个贪财的神偷。但他骨子里藏着纯粹的侠义与善良，最终成为吕洞宾最重要的引路人与羁绊。" },
+            "张果老": { img: "张果老.png", desc: "【通透老者 · 倒骑明道】<br><br>倒骑毛驴的通玄先生。看似慵懒不羁，实则世事洞明。总能在团队最迷茫时，用寥寥数语点破迷局，是八仙中的精神导师。" },
+            "铁拐李": { img: "铁拐李.png", desc: "【火工巧匠 · 技定乾坤】<br><br>资历最深的炼丹老匠人。虽然跛足且面容沧桑，但他手艺极精。告诉我们：不论出身与身体短板，凭借真本事就能在团队立足。" },
+            "何仙姑": { img: "何仙姑.png", desc: "【清荷定心 · 临危不乱】<br><br>团队中唯一的女性，却绝非花瓶。她清醒、有主见，总能在危乱之中稳住局面，是整个草台班子里最重要的定海神针。" },
+            "蓝采和": { img: "蓝采荷.png", desc: "【花篮少年 · 纯真寻药】<br><br>活泼单纯的药童。看似贪玩，却对世间百草药性了如指掌。他证明了热爱与好奇心同样能够铸就最不可替代的专业能力。" },
+            "曹国舅": { img: "曹国舅.png", desc: "【玉板稳磐 · 居中调和】<br><br>皇亲国戚出身，却毫无架子。他端庄持重、谦和公允，是团队在处理纷争与矛盾时最可靠的底牌与协调者。" },
+            "韩湘子": { img: "韩湘子.png", desc: "【笛声渡人 · 灵动共情】<br><br>一袭青衫的俊逸书生。他用音律与极致的同理心抚平团队的焦躁与内讧，完美诠释了沟通与共情也是强大的治愈力量。" },
+            "吕洞宾": { img: "吕洞宾.png", desc: "【纯阳之剑 · 苍生大爱】<br><br>原为天庭骄子，因罪谪贬。从最初满心满眼只想赎罪回天庭的“利己主义者”，蜕变为对抗强权、甘为凡人拔剑的苍生守护神。" }
+        };
+
+        window.openCharModal = function(name) {
+            let data = charData[name];
+            if(data) {
+                document.getElementById('modalName').innerText = name;
+                document.getElementById('modalImg').src = data.img;
+                document.getElementById('modalDesc').innerHTML = data.desc;
+                
+                if (activeCharAudio) { activeCharAudio.pause(); activeCharAudio.currentTime = 0; }
+                let audioEl = document.getElementById('audio_' + name);
+                if(audioEl) {
+                    audioEl.currentTime = 0;
+                    audioEl.play().catch(e => console.log('音频被拦截'));
+                    activeCharAudio = audioEl;
+                }
+
+                let modal = document.getElementById('charModal');
+                modal.style.display = 'flex';
+                setTimeout(() => modal.style.opacity = 1, 50);
+            }
+        };
+
+        window.closeCharModal = function() {
+            if (activeCharAudio) { activeCharAudio.pause(); activeCharAudio.currentTime = 0; activeCharAudio = null; }
+            let modal = document.getElementById('charModal');
+            modal.style.opacity = 0;
+            setTimeout(() => modal.style.display = 'none', 400);
+        };
+
+        // ================= 跑马灯点名与 2026 LaTeX真题引擎 =================
+        let studentPool = ["李静", "王强", "陈雪", "张伟", "刘洋", "赵敏", "孙宇", "周洁"]; 
+        const immortalsNames = ["钟离权", "张果老", "铁拐李", "何仙姑", "蓝采和", "曹国舅", "韩湘子", "吕洞宾"];
+        
+        // 跑马灯素材带 (混合jpg与png增强视觉层次)
+        const rouletteImgs = [
+            "钟离权.jpg", "钟离权.png", "张果老.jpg", "张果老.png",
+            "铁拐李.jpg", "铁拐李.png", "何仙姑.jpg", "何仙姑.png",
+            "蓝采荷.jpg", "蓝采荷.png", "曹国舅.jpg", "曹国舅.png",
+            "韩湘子.jpg", "韩湘子.png", "吕洞宾.jpg", "吕洞宾.png"
+        ];
+        
+        // 初始化跑马灯轨道 (DOM重用优化)
+        const rTrack = document.getElementById('rouletteTrack');
+        let rHtml = '';
+        for(let i=0; i<3; i++) { // 拼接3组，共48张图，足够2.5秒的快速滚动
+            rouletteImgs.forEach(src => { rHtml += `<img src="${src}">`; });
+        }
+        if(rTrack) rTrack.innerHTML = rHtml;
+        
+        // 2026 护考原版真题 (LaTeX排版)
+        const quizBank = [
+            { q: "设集合 $A=\\{\\text{QQ}, \\text{微信}, \\text{微博}, \\text{钉钉}\\}$, $B=\\{\\text{QQ}\\}$, $C=\\{\\text{豆包}\\}$, 则下列关系正确的是（ ）", opts: ["$B \\in A$", "$C \\in A$", "$B \\subseteq A$", "$C \\subseteq A$"], ans: 2, exp: "解析：元素与集合用“$\\in$”，集合与集合用“$\\subseteq$”。$B$ 中的元素在 $A$ 中，因此 $B \\subseteq A$。" },
+            { q: "函数 $f(x) = \\lg(x-3) + \\frac{1}{1-x}$ 的定义域为（ ）", opts: ["$(0,1)$", "$(3,+\\infty)$", "$(-\\infty, 1) \\cup (1,3)$", "$(0,1) \\cup (1,3)$"], ans: 1, exp: "解析：需同时满足真数 $x-3>0$ 且分母 $1-x \\neq 0$。取交集得 $(3,+\\infty)$。" },
+            { q: "设 $a < b,\\; c > d$, 则下列式子正确的是（ ）", opts: ["$ac > bd$", "$ad < bc$", "$a+c < b+d$", "$a+d < b+c$"], ans: 3, exp: "解析：由 $a < b$ 可得 $a+d < b+d$；由 $d < c$ 可得 $b+d < b+c$。根据传递性得 $a+d < b+c$。" },
+            { q: "设向量 $\\vec{a}=(1,2)$, $\\vec{b}=(1,4)$, 则 $|3\\vec{a} - \\vec{b}| = $（ ）", opts: ["$2\\sqrt{2}$", "$2$", "$3\\sqrt{2}$", "$6$"], ans: 0, exp: "解析：$3\\vec{a}=(3,6)$，则 $3\\vec{a}-\\vec{b}=(2,2)$，其模长 $\\sqrt{2^2+2^2}=2\\sqrt{2}$。" },
+            { q: "设函数 $f(x)=ax^2 - |x| + 2026$, 则它的图像关于（ ）", opts: ["原点对称", "直线 $y=x$ 对称", "$x$ 轴对称", "$y$ 轴对称"], ans: 3, exp: "解析：$f(-x) = a(-x)^2 - |-x| + 2026 = f(x)$，故为偶函数，其图像关于 $y$ 轴对称。" },
+            { q: "下列空间几何体是旋转体的是（ ）", opts: ["球", "正方体", "长方体", "正棱锥"], ans: 0, exp: "解析：球是由半圆绕其直径旋转一周得到，属于旋转体。" },
+            { q: "$\\left(2x - \\frac{3}{\\sqrt{x}}\\right)^{10}$ 的展开式中二项式系数最大的项是（ ）", opts: ["第 $4$ 项", "第 $5$ 项", "第 $6$ 项", "第 $7$ 项"], ans: 2, exp: "解析：$n=10$ 为偶数，中间项即第 $\\frac{10}{2}+1 = 6$ 项的二项式系数最大。" },
+            { q: "已知等差数列 $\\{a_n\\}$ 中 $a_1+a_2+a_3=9,\\; a_3+a_4+a_5=-3$, 则公差 $d = $（ ）", opts: ["$-3$", "$3$", "$-1$", "$-2$"], ans: 3, exp: "解析：由中项性质 $3a_2=9 \\implies a_2=3$; $3a_4=-3 \\implies a_4=-1$。$2d = a_4-a_2 = -4 \\implies d=-2$。" }
+        ];
+
+        const bgClasses = ['bg-han', 'bg-cao', 'bg-lan', 'bg-zhang', 'bg-zhong', 'bg-he', 'bg-lv', 'bg-tie'];
+
+        let isDrawing = false;
+        window.triggerDraw = function() {
+            if (isDrawing) return; isDrawing = true;
+            
+            const rContainer = document.getElementById('rouletteContainer');
+            const trackEl = document.getElementById('rouletteTrack');
+            const display = document.getElementById('quizDisplay');
+            const resultBox = document.getElementById('rouletteResult');
+            
+            // 重置UI状态
+            resultBox.style.display = 'none';
+            trackEl.style.display = 'flex';
+            trackEl.style.transition = 'none';
+            trackEl.style.transform = 'translate3d(0px, 0, 0)';
+            document.getElementById('luckyStudent').innerText = "---";
+            
+            display.innerHTML = '<div style="text-align:center;"><h3 style="color: var(--teal); font-size: 2.2rem; letter-spacing: 2px;">仙灵寻卷中...</h3></div>';
+            
+            void trackEl.offsetWidth; // 强制浏览器重绘
+            
+            // 随机数据抽取
+            const randomStudent = studentPool[Math.floor(Math.random() * studentPool.length)];
+            const immortalName = immortalsNames[Math.floor(Math.random() * immortalsNames.length)];
+            const randomQuiz = quizBank[Math.floor(Math.random() * quizBank.length)];
+            
+            // 锁定目标卡位：在第二组中寻找(保证滚动距离充足且避免越界)
+            const ext = Math.random() > 0.5 ? '.jpg' : '.png';
+            const targetImgName = immortalName + (immortalName === "蓝采和" && ext===".jpg" ? "荷" : "") + ext; 
+            let targetBaseIndex = rouletteImgs.indexOf(targetImgName);
+            if(targetBaseIndex === -1) targetBaseIndex = rouletteImgs.indexOf(immortalName + ".png");
+            const targetIndex = 16 + targetBaseIndex; // 落在第16-31位之间
+            
+            const targetImgEl = trackEl.children[targetIndex];
+            const offsetLeft = targetImgEl.offsetLeft;
+            const containerCenter = rContainer.offsetWidth / 2;
+            const imgCenter = targetImgEl.offsetWidth / 2;
+            const targetTranslate = offsetLeft - containerCenter + imgCenter;
+            
+            // 启动转盘动画 (硬件加速)
+            trackEl.style.transition = 'transform 2.5s cubic-bezier(0.1, 0.8, 0.2, 1)';
+            trackEl.style.transform = `translate3d(-${targetTranslate}px, 0, 0)`;
+
+            // 等待转盘停止
+            setTimeout(() => {
+                // 停止后，显示抽中人员
+                document.getElementById('luckyStudent').innerText = randomStudent;
+
+                // 隐藏轨道，显示结果放大定格层
+                trackEl.style.display = 'none';
+                document.getElementById('rouletteResultImg').src = targetImgEl.src;
+                resultBox.style.display = 'flex';
+                
+                // 播放专属配音
+                if (activeCharAudio) { activeCharAudio.pause(); activeCharAudio.currentTime = 0; }
+                let audioEl = document.getElementById('audio_' + immortalName);
+                if(audioEl) {
+                    audioEl.currentTime = 0;
+                    audioEl.play().catch(e => console.log('音频被拦截'));
+                    activeCharAudio = audioEl;
+                }
+                
+                // 渲染左侧 LaTeX 真题面板
+                setTimeout(() => {
+                    let randomBg = bgClasses[Math.floor(Math.random() * bgClasses.length)];
+                    let quizHtml = `
+                        <div class="quiz-card ${randomBg}" style="width:100%; height:100%; display: flex; flex-direction: column; justify-content: center; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); border: 3px solid var(--gold); border-radius: 12px; padding: 4vh 3vw; text-align: left;">
+                            <div class="quiz-title" style="font-weight: 800; color: var(--ink); margin-bottom: 3vh; font-size: max(26pt, 1.8vw); text-shadow: 0 1px 2px rgba(255,255,255,0.8); line-height: 1.6;">
+                                <span style="color:var(--seal);">[2026 样卷直击]</span><br> ${randomQuiz.q}
+                            </div>
+                            <div class="quiz-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2vw;">`;
+                    
+                    randomQuiz.opts.forEach((opt, oIndex) => {
+                        quizHtml += `<button class="quiz-opt-btn" style="background: rgba(255,255,255,0.95); border: 2px solid var(--ink-soft); border-radius: 8px; padding: 2vh 1.5vw; text-align: left; cursor: pointer; font-size: max(22pt, 1.5vw); transition: .2s; font-family: inherit; color: var(--ink); font-weight: bold;" onclick="window.checkQuiz(this, ${oIndex === randomQuiz.ans}); event.stopPropagation();">${['A','B','C','D'][oIndex]}. ${opt}</button>`;
+                    });
+                    
+                    quizHtml += `</div><div class="quiz-exp" style="display: none; margin-top: 3vh; padding: 2vh; background: rgba(0,0,0,0.8); border-left: 5px solid var(--jade); border-radius: 6px; font-size: max(22pt, 1.5vw); color: #fff; line-height: 1.6;">${randomQuiz.exp}</div></div>`;
+                    
+                    display.innerHTML = quizHtml;
+                    
+                    // 触发展开数学公式解析引擎 (MathJax)
+                    if(window.MathJax) {
+                        MathJax.typesetPromise([display]).then(() => { isDrawing = false; });
+                    } else { isDrawing = false; }
+                    
+                }, 500); 
+            }, 2500);
+        };
+
+        window.handleFileUpload = function(e) {
+            let file = e.target.files[0]; if(!file) return;
+            let ext = file.name.split('.').pop().toLowerCase();
+            if(ext === 'xlsx' || ext === 'docx') { alert('请上传 .txt, .md 或 .csv 格式的文件。'); return; }
+            let reader = new FileReader();
+            reader.onload = function(e) {
+                let text = e.target.result;
+                let names = text.split(/[\s,，、\n\r]+/).filter(n => n.trim().length > 1);
+                if(names.length > 0) { studentPool = names; alert(`仙册录入成功！共登记 ${names.length} 名学子。`); } 
+                else { alert('未能识别到学生姓名，请检查文件格式。'); }
+            };
+            reader.readAsText(file);
+        };
+
+        window.checkQuiz = function(btn, isCorrect) {
+            let parent = btn.parentElement; let siblings = parent.querySelectorAll('.quiz-opt-btn');
+            siblings.forEach(b => { b.disabled = true; b.style.cursor = 'not-allowed'; });
+            
+            if (isCorrect) { btn.style.background = '#d4edda'; btn.style.borderColor = '#28a745'; btn.style.color = '#155724'; btn.innerHTML += ' ✅ 正确'; } 
+            else { btn.style.background = '#f8d7da'; btn.style.borderColor = '#dc3545'; btn.style.color = '#721c24'; btn.innerHTML += ' ❌ 错误'; }
+            
+            let expDiv = parent.nextElementSibling; expDiv.style.display = 'block';
+        };
+
+    })();
+    </script>
+</body>
+</html>
